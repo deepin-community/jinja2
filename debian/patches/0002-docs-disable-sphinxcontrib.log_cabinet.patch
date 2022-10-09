@@ -1,0 +1,22 @@
+From: =?utf-8?q?Piotr_O=C5=BCarowski?= <piotr@debian.org>
+Date: Thu, 2 Apr 2020 13:41:14 +0200
+Subject: docs: disable sphinxcontrib.log_cabinet
+
+it's not packaged in Debian yet
+---
+ docs/conf.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+Index: jinja2/docs/conf.py
+===================================================================
+--- jinja2.orig/docs/conf.py
++++ jinja2/docs/conf.py
+@@ -15,7 +15,7 @@ extensions = [
+     "sphinx.ext.autodoc",
+     "sphinx.ext.intersphinx",
+     "pallets_sphinx_themes",
+-    "sphinxcontrib.log_cabinet",
++    # "sphinxcontrib.log_cabinet",
+     "sphinx_issues",
+ ]
+ autodoc_typehints = "description"
