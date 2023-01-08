@@ -1,3 +1,16 @@
+jinja2 (3.0.3-2) unstable; urgency=medium
+
+  * Team upload.
+  * Downgrading python3-babel from depends to recommends (Closes: #1019580).
+
+ -- Thomas Goirand <zigo@debian.org>  Tue, 13 Sep 2022 10:26:29 +0200
+
+jinja2 (3.0.3-1) unstable; urgency=medium
+
+  * New upstream release
+
+ -- Piotr Ożarowski <piotr@debian.org>  Fri, 11 Feb 2022 13:50:47 +0100
+
 jinja2 (3.0.1-2) unstable; urgency=medium
 
   * Uploading to unstable.

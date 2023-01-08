@@ -314,6 +314,28 @@ def test_package_dir_list(package_dir_loader):
 
 
 @pytest.fixture()
+def package_file_loader(monkeypatch):
+    monkeypatch.syspath_prepend(Path(__file__).parent / "res")
+    return PackageLoader("__init__")
+
+
+@pytest.mark.parametrize(
+    ("template", "expect"), [("foo/test.html", "FOO"), ("test.html", "BAR")]
+)
+def test_package_file_source(package_file_loader, template, expect):
+    source, name, up_to_date = package_file_loader.get_source(None, template)
+    assert source.rstrip() == expect
+    assert name.endswith(os.path.join(*split_template_path(template)))
+    assert up_to_date()
+
+
+def test_package_file_list(package_file_loader):
+    templates = package_file_loader.list_templates()
+    assert "foo/test.html" in templates
+    assert "test.html" in templates
+
+
+@pytest.fixture()
 def package_zip_loader(monkeypatch):
     package_zip = (Path(__file__) / ".." / "res" / "package.zip").resolve()
     monkeypatch.syspath_prepend(package_zip)
@@ -337,6 +359,17 @@ def test_package_zip_source(package_zip_loader, template, expect):
 )
 def test_package_zip_list(package_zip_loader):
     assert package_zip_loader.list_templates() == ["foo/test.html", "test.html"]
+
+
+@pytest.mark.parametrize("package_path", ["", ".", "./"])
+def test_package_zip_omit_curdir(package_zip_loader, package_path):
+    """PackageLoader should not add or include "." or "./" in the root
+    path, it is invalid in zip paths.
+    """
+    loader = PackageLoader("t_pack", package_path)
+    assert loader.package_path == ""
+    source, _, _ = loader.get_source(None, "templates/foo/test.html")
+    assert source.rstrip() == "FOO"
 
 
 def test_pep_451_import_hook():

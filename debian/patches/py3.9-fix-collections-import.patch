@@ -16,16 +16,34 @@ Note that this patch is probably useless with future version, as hopefully,
 upstream will fix it (I didn't check). However, I didn't dare upgrading the
 package to the major upstream release 3.x.
 ---
+ src/jinja2/lexer.py   | 5 ++++-
  src/jinja2/nodes.py   | 5 ++++-
  src/jinja2/sandbox.py | 5 ++++-
  src/jinja2/utils.py   | 5 ++++-
- 3 files changed, 12 insertions(+), 3 deletions(-)
+ tests/test_utils.py   | 5 ++++-
+ 5 files changed, 20 insertions(+), 5 deletions(-)
 
+diff --git a/src/jinja2/lexer.py b/src/jinja2/lexer.py
+index c25ab0f..c28c0db 100644
+--- a/src/jinja2/lexer.py
++++ b/src/jinja2/lexer.py
+@@ -6,7 +6,10 @@ template code and python code in expressions.
+ import re
+ import typing as t
+ from ast import literal_eval
+-from collections import deque
++try:
++    from collections.abc import deque
++except ImportError:
++    from collections import deque
+ from sys import intern
+ 
+ from ._identifier import pattern as name_re
 diff --git a/src/jinja2/nodes.py b/src/jinja2/nodes.py
-index 95bd614..753ecc5 100644
+index b2f88d9..53da1e9 100644
 --- a/src/jinja2/nodes.py
 +++ b/src/jinja2/nodes.py
-@@ -5,7 +5,10 @@
+@@ -5,7 +5,10 @@ to normalize nodes.
  import inspect
  import operator
  import typing as t
@@ -38,10 +56,10 @@ index 95bd614..753ecc5 100644
  from markupsafe import Markup
  
 diff --git a/src/jinja2/sandbox.py b/src/jinja2/sandbox.py
-index cfd7993..9913966 100644
+index 4294884..9f96486 100644
 --- a/src/jinja2/sandbox.py
 +++ b/src/jinja2/sandbox.py
-@@ -6,7 +6,10 @@
+@@ -6,7 +6,10 @@ import types
  import typing as t
  from _string import formatter_field_name_split  # type: ignore
  from collections import abc
@@ -54,10 +72,10 @@ index cfd7993..9913966 100644
  
  from markupsafe import EscapeFormatter
 diff --git a/src/jinja2/utils.py b/src/jinja2/utils.py
-index b422ba9..e6c3783 100644
+index 567185f..1efaece 100644
 --- a/src/jinja2/utils.py
 +++ b/src/jinja2/utils.py
-@@ -5,7 +5,10 @@
+@@ -5,7 +5,10 @@ import re
  import typing as t
  import warnings
  from collections import abc
@@ -70,8 +88,9 @@ index b422ba9..e6c3783 100644
  from random import randrange
  from threading import Lock
 diff --git a/tests/test_utils.py b/tests/test_utils.py
---- a/tests/test_utils.py	2021-09-17 23:24:48.164963520 +0200
-+++ b/tests/test_utils.py	2021-09-18 14:38:48.255918195 +0200
+index 7b58af1..9013d7c 100644
+--- a/tests/test_utils.py
++++ b/tests/test_utils.py
 @@ -1,6 +1,9 @@
  import pickle
  import random
@@ -83,18 +102,3 @@ diff --git a/tests/test_utils.py b/tests/test_utils.py
  from copy import copy as shallow_copy
  
  import pytest
-diff --git a/src/jinja2/lexer.py b/src/jinja2/lexer.py
---- a/src/jinja2/lexer.py	2021-09-17 23:24:48.164963520 +0200
-+++ b/src/jinja2/lexer.py	2021-09-18 14:41:27.236572277 +0200
-@@ -6,7 +6,10 @@
- import re
- import typing as t
- from ast import literal_eval
--from collections import deque
-+try:
-+    from collections.abc import deque
-+except ImportError:
-+    from collections import deque
- from sys import intern
- 
- from ._identifier import pattern as name_re
