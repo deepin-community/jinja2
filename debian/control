@@ -38,11 +38,11 @@ Description: documentation for the Jinja2 Python library
 Package: python3-jinja2
 Architecture: all
 Depends:
- python3-babel,
  python3-markupsafe (>= 2.0),
  ${misc:Depends},
  ${python3:Depends},
 Recommends:
+ python3-babel,
  python3-pkg-resources,
 Suggests:
  python-jinja2-doc,
