@@ -7,6 +7,7 @@ from jinja2 import DictLoader
 from jinja2 import Environment
 from jinja2 import nodes
 from jinja2 import pass_context
+from jinja2 import TemplateSyntaxError
 from jinja2.exceptions import TemplateAssertionError
 from jinja2.ext import Extension
 from jinja2.lexer import count_newlines
@@ -43,6 +44,9 @@ newstyle_i18n_templates = {
     "pgettext.html": '{{ pgettext("fruit", "Apple") }}',
     "npgettext.html": '{{ npgettext("fruit", "%(num)s apple", "%(num)s apples",'
     " apples) }}",
+    "pgettext_block": "{% trans 'fruit' num=apples %}Apple{% endtrans %}",
+    "npgettext_block": "{% trans 'fruit' num=apples %}{{ num }} apple"
+    "{% pluralize %}{{ num }} apples{% endtrans %}",
     "transvars1.html": "{% trans %}User: {{ num }}{% endtrans %}",
     "transvars2.html": "{% trans num=count %}User: {{ num }}{% endtrans %}",
     "transvars3.html": "{% trans count=num %}User: {{ count }}{% endtrans %}",
@@ -465,6 +469,18 @@ class TestInternationalization:
             (3, "npgettext", ("babel", "%(users)s user", "%(users)s users", None), []),
         ]
 
+    def test_nested_trans_error(self):
+        s = "{% trans %}foo{% trans %}{% endtrans %}"
+        with pytest.raises(TemplateSyntaxError) as excinfo:
+            i18n_env.from_string(s)
+        assert "trans blocks can't be nested" in str(excinfo.value)
+
+    def test_trans_block_error(self):
+        s = "{% trans %}foo{% wibble bar %}{% endwibble %}{% endtrans %}"
+        with pytest.raises(TemplateSyntaxError) as excinfo:
+            i18n_env.from_string(s)
+        assert "saw `wibble`" in str(excinfo.value)
+
 
 class TestScope:
     def test_basic_scope_behavior(self):
@@ -593,8 +609,17 @@ class TestNewstyleInternationalization:
         tmpl = newstyle_i18n_env.get_template("pgettext.html")
         assert tmpl.render(LANGUAGE="de") == "Apple"
 
-    def test_context_newstyle_plural(self):
+    def test_context_plural(self):
         tmpl = newstyle_i18n_env.get_template("npgettext.html")
+        assert tmpl.render(LANGUAGE="de", apples=1) == "1 Apple"
+        assert tmpl.render(LANGUAGE="de", apples=5) == "5 Apples"
+
+    def test_context_block(self):
+        tmpl = newstyle_i18n_env.get_template("pgettext_block")
+        assert tmpl.render(LANGUAGE="de") == "Apple"
+
+    def test_context_plural_block(self):
+        tmpl = newstyle_i18n_env.get_template("npgettext_block")
         assert tmpl.render(LANGUAGE="de", apples=1) == "1 Apple"
         assert tmpl.render(LANGUAGE="de", apples=5) == "5 Apples"
 

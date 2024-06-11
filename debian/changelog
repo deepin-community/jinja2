@@ -1,3 +1,26 @@
+jinja2 (3.1.3-1) unstable; urgency=medium
+
+  * Team upload.
+  * New upstream version 3.1.3 (Closes: #1060748)
+  * CVE-2024-22195: HTML attribute injection when passing user input as
+    keys to xmlattr filter
+
+ -- Hans-Christoph Steiner <hans@eds.org>  Tue, 05 Mar 2024 09:32:06 +0100
+
+jinja2 (3.1.2-1) unstable; urgency=medium
+
+  [ Thomas Goirand ]
+  * Add python3-pytest as build-depends (now run tests at build time).
+  * Add autopkgtest.
+
+  [ Piotr Ożarowski ]
+  * New upstream release (closes: 1025808, 1023637)
+  * Add 0003-fix-nose-leftovers patch
+  * Bump minimum required python3-pallets-sphinx-themes build dependency
+    (closes: 1005864)
+
+ -- Piotr Ożarowski <piotr@debian.org>  Fri, 24 Feb 2023 16:15:45 +0100
+
 jinja2 (3.0.3-2) unstable; urgency=medium
 
   * Team upload.

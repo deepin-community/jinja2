@@ -35,6 +35,7 @@ examples/basic/test_loop_filter.py
 examples/basic/translate.py
 examples/basic/templates/broken.html
 examples/basic/templates/subbroken.html
+requirements/build.txt
 requirements/dev.txt
 requirements/docs.txt
 requirements/tests.txt
@@ -80,7 +81,6 @@ tests/test_compile.py
 tests/test_core_tags.py
 tests/test_debug.py
 tests/test_ext.py
-tests/test_features.py
 tests/test_filters.py
 tests/test_idtracking.py
 tests/test_imports.py
@@ -89,6 +89,7 @@ tests/test_lexnparse.py
 tests/test_loader.py
 tests/test_nativetypes.py
 tests/test_nodes.py
+tests/test_pickle.py
 tests/test_regression.py
 tests/test_runtime.py
 tests/test_security.py
