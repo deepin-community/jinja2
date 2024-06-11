@@ -24,7 +24,7 @@ package to the major upstream release 3.x.
  5 files changed, 20 insertions(+), 5 deletions(-)
 
 diff --git a/src/jinja2/lexer.py b/src/jinja2/lexer.py
-index c25ab0f..c28c0db 100644
+index aff7e9f..37ef342 100644
 --- a/src/jinja2/lexer.py
 +++ b/src/jinja2/lexer.py
 @@ -6,7 +6,10 @@ template code and python code in expressions.
@@ -56,7 +56,7 @@ index b2f88d9..53da1e9 100644
  from markupsafe import Markup
  
 diff --git a/src/jinja2/sandbox.py b/src/jinja2/sandbox.py
-index 4294884..9f96486 100644
+index 06d7414..f443c18 100644
 --- a/src/jinja2/sandbox.py
 +++ b/src/jinja2/sandbox.py
 @@ -6,7 +6,10 @@ import types
@@ -72,12 +72,12 @@ index 4294884..9f96486 100644
  
  from markupsafe import EscapeFormatter
 diff --git a/src/jinja2/utils.py b/src/jinja2/utils.py
-index 567185f..1efaece 100644
+index 9b5f5a5..205b2af 100644
 --- a/src/jinja2/utils.py
 +++ b/src/jinja2/utils.py
-@@ -5,7 +5,10 @@ import re
+@@ -4,7 +4,10 @@ import os
+ import re
  import typing as t
- import warnings
  from collections import abc
 -from collections import deque
 +try:

@@ -3,6 +3,7 @@ sources.
 """
 import importlib.util
 import os
+import posixpath
 import sys
 import typing as t
 import weakref
@@ -14,7 +15,6 @@ from types import ModuleType
 
 from .exceptions import TemplateNotFound
 from .utils import internalcode
-from .utils import open_if_exists
 
 if t.TYPE_CHECKING:
     from .environment import Environment
@@ -192,26 +192,30 @@ class FileSystemLoader(BaseLoader):
         self, environment: "Environment", template: str
     ) -> t.Tuple[str, str, t.Callable[[], bool]]:
         pieces = split_template_path(template)
+
         for searchpath in self.searchpath:
-            filename = os.path.join(searchpath, *pieces)
-            f = open_if_exists(filename)
-            if f is None:
-                continue
+            # Use posixpath even on Windows to avoid "drive:" or UNC
+            # segments breaking out of the search directory.
+            filename = posixpath.join(searchpath, *pieces)
+
+            if os.path.isfile(filename):
+                break
+        else:
+            raise TemplateNotFound(template)
+
+        with open(filename, encoding=self.encoding) as f:
+            contents = f.read()
+
+        mtime = os.path.getmtime(filename)
+
+        def uptodate() -> bool:
             try:
-                contents = f.read().decode(self.encoding)
-            finally:
-                f.close()
+                return os.path.getmtime(filename) == mtime
+            except OSError:
+                return False
 
-            mtime = os.path.getmtime(filename)
-
-            def uptodate() -> bool:
-                try:
-                    return os.path.getmtime(filename) == mtime
-                except OSError:
-                    return False
-
-            return contents, filename, uptodate
-        raise TemplateNotFound(template)
+        # Use normpath to convert Windows altsep to sep.
+        return contents, os.path.normpath(filename), uptodate
 
     def list_templates(self) -> t.List[str]:
         found = set()
@@ -296,7 +300,7 @@ class PackageLoader(BaseLoader):
         if isinstance(loader, zipimport.zipimporter):
             self._archive = loader.archive
             pkgdir = next(iter(spec.submodule_search_locations))  # type: ignore
-            template_root = os.path.join(pkgdir, package_path)
+            template_root = os.path.join(pkgdir, package_path).rstrip(os.path.sep)
         else:
             roots: t.List[str] = []
 
@@ -326,7 +330,12 @@ class PackageLoader(BaseLoader):
     def get_source(
         self, environment: "Environment", template: str
     ) -> t.Tuple[str, str, t.Optional[t.Callable[[], bool]]]:
-        p = os.path.join(self._template_root, *split_template_path(template))
+        # Use posixpath even on Windows to avoid "drive:" or UNC
+        # segments breaking out of the search directory. Use normpath to
+        # convert Windows altsep to sep.
+        p = os.path.normpath(
+            posixpath.join(self._template_root, *split_template_path(template))
+        )
         up_to_date: t.Optional[t.Callable[[], bool]]
 
         if self._archive is None:
@@ -383,7 +392,7 @@ class PackageLoader(BaseLoader):
             )
             offset = len(prefix)
 
-            for name in self._loader._files.keys():  # type: ignore
+            for name in self._loader._files.keys():
                 # Find names under the templates directory that aren't directories.
                 if name.startswith(prefix) and name[-1] != os.path.sep:
                     results.append(name[offset:].replace(os.path.sep, "/"))
@@ -603,7 +612,7 @@ class ModuleLoader(BaseLoader):
         if not isinstance(path, abc.Iterable) or isinstance(path, str):
             path = [path]
 
-        mod.__path__ = [os.fspath(p) for p in path]  # type: ignore
+        mod.__path__ = [os.fspath(p) for p in path]
 
         sys.modules[package_name] = weakref.proxy(
             mod, lambda x: sys.modules.pop(package_name, None)
